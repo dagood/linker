@@ -70,6 +70,7 @@
     <Compile Include="Linker.Steps\IStep.cs" />
     <Compile Include="Linker.Steps\LoadReferencesStep.cs" />
     <Compile Include="Linker.Steps\MarkStep.cs" />
+    <Compile Include="Linker.Steps\MarkStepWithReflectionHeuristics.cs" />
     <Compile Include="Linker.Steps\OutputStep.cs" />
     <Compile Include="Linker.Steps\ResolveFromXApiStep.cs" />
     <Compile Include="Linker.Steps\ResolveFromAssemblyStep.cs" />

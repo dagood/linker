@@ -232,6 +232,10 @@ namespace Mono.Linker {
 					case 'v':
 						context.KeepMembersForDebugger = bool.Parse (GetParam ());
 						break;
+					case 'h':
+						ICollection<string> reflectionHeuristics = ParseReflectionHeuristics (GetParam ());
+						p.ReplaceStep (typeof (MarkStep), new MarkStepWithReflectionHeuristics (reflectionHeuristics));
+						break;
 					default:
 						Usage ("Unknown option: `" + token [1] + "'");
 						break;
@@ -340,6 +344,15 @@ namespace Mono.Linker {
 			return assemblies;
 		}
 
+		protected static ICollection<string> ParseReflectionHeuristics(string str)
+		{
+			HashSet<string> heuristics = new HashSet<string> (StringComparer.OrdinalIgnoreCase);
+			string[] parts = str.Split (',');
+			foreach (string part in parts)
+				heuristics.Add (part);
+
+			return heuristics;
+		}
 
 		AssemblyAction ParseAssemblyAction (string s)
 		{
@@ -399,6 +412,15 @@ namespace Mono.Linker {
 			Console.WriteLine ("   -b                  Generate debug symbols for each linked module (true or false)");
 			Console.WriteLine ("   -g                  Generate a new unique guid for each linked module (true or false)");
 			Console.WriteLine ("   -v                  Keep members needed by debugger (true or false)");
+			Console.WriteLine ("   -h                  List of reflection heuristics separated with a comma.");
+			Console.WriteLine ("                       Supported heuristics:");
+			Console.WriteLine ("                         LdtokenTypeMethods:   mark all methods of types whose token is used");
+			Console.WriteLine ("                                               in an ldtoken instruction");
+			Console.WriteLine ("                         LdtokenTypeFields:    mark all fields of types whose token is used");
+			Console.WriteLine ("                                               in an ldtoken instruction");
+			Console.WriteLine ("                         InstanceConstructors: mark all instance constructors in types");
+			Console.WriteLine ("                                               where an instance member has been marked but");
+			Console.WriteLine ("                                               none of the instance constructors have been marked");
 			Console.WriteLine ("   -l                  List of i18n assemblies to copy to the output directory");
 			Console.WriteLine ("                         separated with a comma: none,all,cjk,mideast,other,rare,west");
 			Console.WriteLine ("                         default is all");
