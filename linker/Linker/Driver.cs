@@ -43,6 +43,8 @@ namespace Mono.Linker {
 		static readonly string _linker = "Mono CIL Linker";
 #endif
 
+		static ILogger __customLogger;
+
 		public static int Main (string [] args)
 		{
 			return Execute (args);
@@ -50,6 +52,7 @@ namespace Mono.Linker {
 
 		public static int Execute (string[] args, ILogger customLogger = null)
 		{
+			__customLogger = customLogger;
 			if (args.Length == 0)
 				Usage ("No parameters specified");
 
@@ -369,45 +372,51 @@ namespace Mono.Linker {
 
 		static void Usage (string msg)
 		{
-			Console.WriteLine (_linker);
+			void Write(string message)
+			{
+				__customLogger?.LogMessage(MessageImportance.High, message);
+				Console.WriteLine(message);
+			}
+
+			Write (_linker);
 			if (msg != null)
-				Console.WriteLine ("Error: " + msg);
+				Write ("Error: " + msg);
 #if FEATURE_ILLINK
-			Console.WriteLine ("illink [options] -x|-a|-i file");
+			Write ("illink [options] -x|-a|-i file");
 #else
-			Console.WriteLine ("monolinker [options] -x|-a|-i file");
+			Write ("monolinker [options] -x|-a|-i file");
 #endif
 
-			Console.WriteLine ("   --about             About the {0}", _linker);
-			Console.WriteLine ("   --version           Print the version number of the {0}", _linker);
-			Console.WriteLine ("   --skip-unresolved   Ignore unresolved types, methods, and assemblies (true or false)");
-			Console.WriteLine ("   --verbose           Log messages indicating progress and warnings");
-			Console.WriteLine ("   --dependencies-file Specify the dependencies file path, if unset the default path is used: <output directory>/linker-dependencies.xml.gz");
-			Console.WriteLine ("   --dump-dependencies Dump dependencies for the linker analyzer tool");
-			Console.WriteLine ("   --reduced-tracing   Reduces dependency output related to assemblies that will not be modified");
-			Console.WriteLine ("   --used-attrs-only   Attributes on types, methods, etc will be removed if the attribute type is not used");
-			Console.WriteLine ("   --strip-security    In linked assemblies, attributes on assemblies, types, and methods related to security will be removed");
-			Console.WriteLine ("   --strip-resources   Remove link xml resources that were processed (true or false), default to true");
-			Console.WriteLine ("   --exclude-feature   Any code which has feature-name dependency will be removed");
-			Console.WriteLine ("   -out                Specify the output directory, default to `output'");
-			Console.WriteLine ("   -c                  Action on the core assemblies, skip, copy, copyused, addbypassngen, addbypassngenused or link, default to skip");
-			Console.WriteLine ("   -u                  Action on the user assemblies, skip, copy, copyused, addbypassngen, addbypassngenused or link, default to link");
-			Console.WriteLine ("   -p                  Action per assembly");
-			Console.WriteLine ("   -s                  Add a new step to the pipeline.");
-			Console.WriteLine ("   -t                  Keep assemblies in which only type forwarders are referenced.");
-			Console.WriteLine ("   -d                  Add a directory where the linker will look for assemblies");
-			Console.WriteLine ("   -b                  Generate debug symbols for each linked module (true or false)");
-			Console.WriteLine ("   -g                  Generate a new unique guid for each linked module (true or false)");
-			Console.WriteLine ("   -v                  Keep members needed by debugger (true or false)");
-			Console.WriteLine ("   -l                  List of i18n assemblies to copy to the output directory");
-			Console.WriteLine ("                         separated with a comma: none,all,cjk,mideast,other,rare,west");
-			Console.WriteLine ("                         default is all");
-			Console.WriteLine ("   -x                  Link from an XML descriptor");
-			Console.WriteLine ("   -a                  Link from a list of assemblies");
-			Console.WriteLine ("   -r                  Link from a list of assemblies using roots visible outside of the assembly");
-			Console.WriteLine ("   -i                  Link from an mono-api-info descriptor");
-			Console.WriteLine ("   -z                  Include default preservations (true or false), default to true");
-			Console.WriteLine ("");
+			Write ($"   --about             About the {_linker}");
+			Write ($"   --version           Print the version number of the {_linker}");
+			Write ("   --skip-unresolved   Ignore unresolved types, methods, and assemblies (true or false)");
+			Write ("   --verbose           Log messages indicating progress and warnings");
+			Write ("   --dependencies-file Specify the dependencies file path, if unset the default path is used: <output directory>/linker-dependencies.xml.gz");
+			Write ("   --dump-dependencies Dump dependencies for the linker analyzer tool");
+			Write ("   --reduced-tracing   Reduces dependency output related to assemblies that will not be modified");
+			Write ("   --used-attrs-only   Attributes on types, methods, etc will be removed if the attribute type is not used");
+			Write ("   --strip-security    In linked assemblies, attributes on assemblies, types, and methods related to security will be removed");
+			Write ("   --strip-resources   Remove link xml resources that were processed (true or false), default to true");
+			Write ("   --exclude-feature   Any code which has feature-name dependency will be removed");
+			Write ("   -out                Specify the output directory, default to `output'");
+			Write ("   -c                  Action on the core assemblies, skip, copy, copyused, addbypassngen, addbypassngenused or link, default to skip");
+			Write ("   -u                  Action on the user assemblies, skip, copy, copyused, addbypassngen, addbypassngenused or link, default to link");
+			Write ("   -p                  Action per assembly");
+			Write ("   -s                  Add a new step to the pipeline.");
+			Write ("   -t                  Keep assemblies in which only type forwarders are referenced.");
+			Write ("   -d                  Add a directory where the linker will look for assemblies");
+			Write ("   -b                  Generate debug symbols for each linked module (true or false)");
+			Write ("   -g                  Generate a new unique guid for each linked module (true or false)");
+			Write ("   -v                  Keep members needed by debugger (true or false)");
+			Write ("   -l                  List of i18n assemblies to copy to the output directory");
+			Write ("                         separated with a comma: none,all,cjk,mideast,other,rare,west");
+			Write ("                         default is all");
+			Write ("   -x                  Link from an XML descriptor");
+			Write ("   -a                  Link from a list of assemblies");
+			Write ("   -r                  Link from a list of assemblies using roots visible outside of the assembly");
+			Write ("   -i                  Link from an mono-api-info descriptor");
+			Write ("   -z                  Include default preservations (true or false), default to true");
+			Write ("");
 
 			Environment.Exit (1);
 		}
