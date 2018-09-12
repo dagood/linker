@@ -76,8 +76,19 @@ namespace ILLink.Tasks
 			var argsString = String.Join (" ", args);
 			Log.LogMessageFromText ($"illink {argsString}", MessageImportance.Normal);
 			var logger = new AdapterLogger (Log);
-			int ret = Mono.Linker.Driver.Execute (args, logger);
-			return ret == 0;
+			logger.LogMessage(Mono.Linker.MessageImportance.High, "The logger seems to work.");
+			Log.LogMessageFromText ("Did the logger work? Look up.", MessageImportance.Normal);
+			try
+			{
+				int ret = Mono.Linker.Driver.Execute (args, logger);
+				return ret == 0;
+			}
+			catch (Exception e)
+			{
+				Log.LogWarningFromException(e);
+				Console.WriteLine(e);
+				throw;
+			}
 		}
 
 		string [] GenerateCommandLineCommands ()

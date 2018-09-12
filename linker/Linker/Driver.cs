@@ -50,15 +50,21 @@ namespace Mono.Linker {
 
 		public static int Execute (string[] args, ILogger customLogger = null)
 		{
+			customLogger?.LogMessage(MessageImportance.High, "Inside Driver.Execute");
 			if (args.Length == 0)
 				Usage ("No parameters specified");
+			customLogger?.LogMessage(MessageImportance.High, "Args detected");
 
 			try {
 
 				Driver driver = new Driver (args);
+				customLogger?.LogMessage(MessageImportance.High, "Created driver");
 				driver.Run (customLogger);
+				customLogger?.LogMessage(MessageImportance.High, "Ran driver.Run");
 
 			} catch (Exception e) {
+				customLogger?.LogMessage(MessageImportance.High, "Fatal error");
+				customLogger?.LogMessage(MessageImportance.High, e.ToString());
 				Console.WriteLine ("Fatal error in {0}", _linker);
 				Console.WriteLine (e);
 				return 1;
